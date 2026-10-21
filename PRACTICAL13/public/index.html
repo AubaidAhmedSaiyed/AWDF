@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Practical 13 - AI-Powered Task Management</title>
+    <style>
+      body { font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+      .container { max-width: 650px; margin: 0 auto; background: #1e293b; padding: 2rem; border-radius: 12px; }
+      input, textarea { width: 100%; box-sizing: border-box; padding: 0.75rem; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 6px; margin: 0.5rem 0 1rem; }
+      button { padding: 0.65rem 1.25rem; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; }
+      .btn-primary { background: #2563eb; color: white; }
+      .btn-ai { background: #8b5cf6; color: white; margin-bottom: 0.5rem; }
+      .fallback-badge { background: #f59e0b; color: #1e293b; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+      .task-card { background: #0f172a; padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid #334155; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🤖 AI Task Assistant</h1>
+      <p style="color: #94a3b8;">Practical 13: Auto-generating task descriptions via Backend AI Endpoint</p>
+
+      <form id="taskForm">
+        <label>Task Title</label>
+        <input type="text" id="title" placeholder="e.g., Implement Docker Compose deployment" required />
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <label>Task Description (Editable Suggestion)</label>
+          <button type="button" id="aiBtn" class="btn-ai">✨ Generate with AI</button>
+        </div>
+        <textarea id="description" rows="3" placeholder="Click 'Generate with AI' to auto-populate..."></textarea>
+
+        <button type="submit" class="btn btn-primary">Save Task</button>
+      </form>
+
+      <h2 style="margin-top: 2rem;">Saved Tasks</h2>
+      <div id="taskList"></div>
+    </div>
+
+    <script>
+      const aiBtn = document.getElementById('aiBtn');
+      const titleInput = document.getElementById('title');
+      const descInput = document.getElementById('description');
+      const form = document.getElementById('taskForm');
+      const taskList = document.getElementById('taskList');
+
+      aiBtn.addEventListener('click', async () => {
+        const title = titleInput.value.trim();
+        if (!title) return alert('Please enter a task title first.');
+        aiBtn.disabled = true;
+        aiBtn.innerText = '⏳ Calling AI...';
+
+        try {
+          const res = await fetch('/api/ai/generate-description', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title })
+          });
+          const data = await res.json();
+          descInput.value = data.description;
+          if (data.fallback) {
+            alert('⚠️ ' + data.errorNotice);
+          }
+        } catch (err) {
+          alert('Network error calling AI endpoint');
+        } finally {
+          aiBtn.disabled = false;
+          aiBtn.innerText = '✨ Generate with AI';
+        }
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const res = await fetch('/tasks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: titleInput.value, description: descInput.value })
+        });
+        const task = await res.json();
+        titleInput.value = '';
+        descInput.value = '';
+        renderTasks();
+      });
+
+      async function renderTasks() {
+        const res = await fetch('/tasks');
+        const tasks = await res.json();
+        taskList.innerHTML = tasks.map(t => `
+          <div class="task-card">
+            <strong>${t.title}</strong>
+            <p style="margin: 0.25rem 0 0; color: #cbd5e1; font-size: 0.9rem;">${t.description}</p>
+          </div>
+        `).join('');
+      }
+
+      renderTasks();
+    </script>
+  </body>
+</html>

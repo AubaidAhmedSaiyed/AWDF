@@ -1,0 +1,14 @@
+{
+  "name": "practical11-containerization-docker",
+  "version": "1.0.0",
+  "description": "Practical 11 - Containerization with Docker and Docker Compose",
+  "scripts": {
+    "lab": "node lab-runner.js",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:ps": "docker compose ps"
+  },
+  "keywords": ["docker", "docker-compose", "containerization", "microservices"],
+  "author": "ITUE301 Student",
+  "license": "ISC"
+}

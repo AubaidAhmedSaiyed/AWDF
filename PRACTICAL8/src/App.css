@@ -1,0 +1,49 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #1e293b;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.nav-link {
+  color: #94a3b8;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+.nav-link.active {
+  background: #2563eb;
+  color: white;
+}
+
+.card {
+  background: #1e293b;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #334155;
+}
+
+.loading-fallback {
+  padding: 2rem;
+  text-align: center;
+  background: #1e293b;
+  border-radius: 8px;
+  color: #38bdf8;
+  font-size: 1.1rem;
+  font-weight: 600;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
